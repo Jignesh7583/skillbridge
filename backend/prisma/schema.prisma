@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ─── USERS ───────────────────────────────────────────────
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         String   // STUDENT, COLLEGE, COMPANY, ADMIN
+  location     String   @default("")  // District / City
+  organization String   @default("")  // College name or Company name
+  createdAt    DateTime @default(now())
+
+  jobPostings      JobPosting[]
+  syllabuses       Syllabus[]
+  gapReports       GapReport[]
+  employerSurveys  EmployerSurvey[]
+  placements       PlacementRecord[]  @relation("PlacedStudent")
+  placedBy         PlacementRecord[]  @relation("PlacingCompany")
+}
+
+// ─── JOB POSTINGS (COMPANY) ─────────────────────────────
+model JobPosting {
+  id               String   @id @default(uuid())
+  title            String
+  description      String
+  requirements     String   // Comma-separated skills
+  sector           String   @default("IT")  // IT, Mechanical, Civil, Healthcare, Management, etc.
+  location         String   @default("")    // District / City
+  proficiencyLevel String   @default("Intermediate") // Beginner, Intermediate, Advanced
+  minExperience    Int      @default(0)     // Years
+  salaryRange      String   @default("")    // e.g. "4-8 LPA"
+  isActive         Boolean  @default(true)
+  companyId        String
+  company          User     @relation(fields: [companyId], references: [id])
+  createdAt        DateTime @default(now())
+}
+
+// ─── SYLLABUS (COLLEGE) ─────────────────────────────────
+model Syllabus {
+  id          String   @id @default(uuid())
+  branch      String
+  semester    String
+  subjects    String   // Comma-separated subject names
+  content     String   // Full syllabus text for NLP
+  university  String   @default("")
+  lastUpdated String   @default("2024")  // Year of last curriculum revision
+  collegeId   String
+  college     User     @relation(fields: [collegeId], references: [id])
+  createdAt   DateTime @default(now())
+
+  gapReports  GapReport[]
+}
+
+// ─── GAP REPORT ─────────────────────────────────────────
+model GapReport {
+  id               String   @id @default(uuid())
+  missingSkills    String   // Comma-separated
+  matchedSkills    String   // Comma-separated
+  obsoleteSkills   String   @default("")  // Skills in syllabus that are outdated
+  recommendations  String   @default("")  // JSON: curriculum update suggestions
+  overallScore     Int      @default(0)   // 0-100 alignment percentage
+  demandAnalysis   String   @default("")  // JSON: skill demand breakdown
+
+  collegeId   String
+  college     User     @relation(fields: [collegeId], references: [id])
+  syllabusId  String
+  syllabus    Syllabus @relation(fields: [syllabusId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+// ─── SKILL TAXONOMY (MASTER DATA) ───────────────────────
+model SkillTaxonomy {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  category       String   // Programming, Database, Cloud, DevOps, Soft Skills, etc.
+  sector         String   @default("IT")  // IT, Mechanical, Civil, etc.
+  demandLevel    String   @default("Medium")  // High, Medium, Low
+  trendDirection String   @default("Stable")  // Rising, Stable, Declining
+  description    String   @default("")
+  createdAt      DateTime @default(now())
+}
+
+// ─── PLACEMENT RECORDS ──────────────────────────────────
+model PlacementRecord {
+  id         String   @id @default(uuid())
+  jobRole    String
+  package    String   @default("")   // e.g. "6 LPA"
+  location   String   @default("")
+  isPlaced   Boolean  @default(true)
+
+  studentId  String
+  student    User     @relation("PlacedStudent", fields: [studentId], references: [id])
+  companyId  String
+  company    User     @relation("PlacingCompany", fields: [companyId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+// ─── EMPLOYER SURVEY ────────────────────────────────────
+model EmployerSurvey {
+  id                 String   @id @default(uuid())
+  satisfactionScore  Int      @default(3)   // 1-5
+  feedbackText       String   @default("")
+  skillsNeeded       String   @default("")  // Comma-separated skills they need
+  hiringDistrict     String   @default("")
+  candidateQuality   String   @default("Average")  // Poor, Below Average, Average, Good, Excellent
+
+  companyId  String
+  company    User     @relation(fields: [companyId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+// ─── DISTRICT TRAINING PLAN ─────────────────────────────
+model TrainingPlan {
+  id                    String   @id @default(uuid())
+  district              String
+  targetSkills          String   // Comma-separated
+  recommendedCourses    String   // JSON array of course recommendations
+  trainerRequirements   String   @default("")  // What trainers are needed
+  equipmentNeeded       String   @default("")  // Lab/equipment needs
+  timeline              String   @default("6 months")
+  status                String   @default("Draft")  // Draft, Approved, In Progress, Completed
+  createdAt             DateTime @default(now())
+}

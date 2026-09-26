@@ -1,0 +1,366 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=1.2in}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{tabularx}
+\usepackage{float}
+
+\renewcommand{\baselinestretch}{1.5}
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+\begin{document}
+
+% --- TITLE PAGE ---
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        \Large{\textbf{Analysis of Skill Gap and Labour Market Demand using NLP}} \\
+        \vspace{1cm}
+        A \\
+        \vspace{1cm}
+        \Large{\textbf{Project-I Report}} \\
+        \vspace{1cm}
+        Submitted \\
+        In Partial Fulfilment \\
+        For the award of the Degree of \\
+        \vspace{0.5cm}
+        \Large{\textbf{Bachelor of Technology}} \\
+        \Large{\textbf{(VII Semester)}} \\
+        \vspace{1.5cm}
+        % Dummy logo
+        \rule{4cm}{4cm} \\ % Replace with \includegraphics[width=4cm]{logo.png}
+        \vspace{1.5cm}
+        
+        \begin{flushleft}
+        \textbf{Supervised By:} \hfill \textbf{Submitted By:} \\
+        Guide Name \hfill Student Name \\
+        Designation \hfill Roll No: \\
+        \end{flushleft}
+        
+        \vspace{2cm}
+        \textbf{Department of Computer Science and Engineering} \\
+        \textbf{Jodhpur Institute of Engineering and Technology (Autonomous)} \\
+        \textbf{JIET Universe, Jodhpur} \\
+        \textbf{Session 2026-27}
+    \end{center}
+\end{titlepage}
+
+% --- CERTIFICATE ---
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{2cm}
+    \Huge{\textbf{Certificate}}
+\end{center}
+\vspace{1cm}
+\large
+This is to certify that the project entitled ``\textbf{Analysis of Skill Gap and Labour Market Demand using NLP}'' has been carried out by the students of \textbf{Jodhpur Institute of Engineering \& Technology, Jodhpur} under my guidance and supervision in partial fulfillment of the degree of Bachelor of Technology in Computer Science and Engineering of Bikaner Technical University during the academic year of 2026-27.
+\vspace{4cm}
+
+\begin{flushleft}
+\textbf{Date:} \hfill \textbf{Supervisor's Name} \\
+\textbf{Place:} \hfill \textbf{Designation}
+\end{flushleft}
+
+% --- ACKNOWLEDGMENT ---
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{2cm}
+    \Huge{\textbf{Acknowledgment}}
+\end{center}
+\vspace{1cm}
+\large
+I want to express my sincere gratitude to all those who have been instrumental in the completion of my project report on ``Analysis of Skill Gap and Labour Market Demand using NLP''. Working on this project has been a huge learning experience, and I am grateful to everyone who helped us along the way.
+
+An acknowledgment is extended to my guide for their remarkable contributions. Their expertise, feedback, and dedication played a crucial role in achieving our goals. Their guidance kept us on track whenever we faced bugs or logic issues, especially during the backend and ML integration phases.
+
+Furthermore, I am grateful to my academic institution, Jodhpur Institute of Engineering and Technology, for providing the opportunity and the lab facilities to work on this real-world problem statement. The environment provided by the institution played a big role in the successful completion of this project.
+
+Lastly, I express my gratitude to my teammates and friends whose direct and indirect support contributed to finishing this project on time.
+
+\vspace{2cm}
+\begin{flushleft}
+\textbf{Student Name} \\
+Roll No: \\
+Date :
+\end{flushleft}
+
+% --- TOC ---
+\newpage
+\tableofcontents
+
+% --- CHAPTER 1: INTRODUCTION ---
+\chapter{Introduction}
+
+\section{Background of the Study}
+In recent years, the gap between what colleges teach and what the industry actually needs has become a major issue. Many students graduate with degrees but struggle to find jobs because they lack the specific technical skills that companies are actively hiring for. At the same time, companies complain that they cannot find industry-ready freshers. 
+
+To solve this, we need a way to track the exact skills demanded by the market and compare them directly against college syllabuses. By automating this process using Natural Language Processing (NLP), we can extract skills from job descriptions and college PDFs, and give students and colleges a clear, mathematical gap report. This project, SkillBridge AI, is built to bridge this exact gap using a modern tech stack (React, Node.js, Python Flask).
+
+\section{Problem Statement}
+Colleges currently design their curriculum based on outdated academic guidelines, while the IT industry evolves every few months. There is no automated feedback loop between employers and educational institutes. Traditional methods of updating a syllabus rely on slow, manual surveys that take years to implement. Therefore, the problem is to build an automated Labour Market Intelligence platform that can read live job postings, extract required skills, analyze college syllabuses, and output actionable training plans and gap reports in real-time.
+
+\section{Objectives of the Project}
+The primary objective is to design and develop a web-based platform for skill gap analysis. The sub-objectives include:
+\begin{itemize}
+    \item Collecting live job postings and extracting skills using NLP and regular expressions.
+    \item Parsing college syllabus text to identify currently taught subjects.
+    \item Calculating an Industry Readiness Score for students based on their personal skills.
+    \item Generating district-level training plans for colleges to upgrade their labs and faculty.
+    \item Providing a dashboard for companies to submit future skill requirements.
+\end{itemize}
+
+\section{Scope of the Project}
+The scope of this project is limited to the IT and Software Engineering sectors for the prototype phase. It handles text-based syllabus inputs and compares them against a predefined taxonomy of over 200 IT skills (like Python, React, Docker, AWS). The system focuses on providing three distinct dashboards: one for Students, one for Colleges, and one for Companies, managed by an Admin portal.
+
+\section{Significance of the Study}
+This project provides a practical tool for educational boards and universities to modernize their courses. Instead of guessing what to teach, colleges can look at the dashboard and see exactly what skills are rising (e.g., Generative AI) and what is declining. For students, it provides a reality check on their employability and suggests direct courses to fix their skill gaps.
+
+\section{Methodology Overview}
+The methodology followed in this project includes:
+\begin{enumerate}
+    \item Requirement gathering from the SIH problem statement.
+    \item Designing the database schema using Prisma and SQLite.
+    \item Building the ML engine in Python (Flask) for skill extraction using a taxonomy dictionary.
+    \item Developing the backend API using Node.js and Express.
+    \item Creating the frontend user interface using React and modern CSS.
+    \item Integrating all tiers and deploying for testing.
+\end{enumerate}
+
+% --- CHAPTER 2: LITERATURE SURVEY ---
+\chapter{Literature Survey}
+
+\section{Introduction}
+This chapter presents a review of existing methods used for skill extraction and curriculum analysis. We looked at how different researchers have attempted to solve the academic-industry gap using technology.
+
+\section{Labour Market Intelligence Systems}
+Labour Market Intelligence (LMI) refers to systems that analyze job market data to find trends. Most existing LMI systems are heavily enterprise-focused and expensive. They scrape LinkedIn or Indeed to sell data to recruiters. However, there are very few systems designed specifically to give this data back to colleges in the form of a "Syllabus Gap Report."
+
+\section{Text Mining in Job Descriptions}
+Extracting skills from job descriptions is a classic text mining problem. Job descriptions are usually unstructured text. 
+\begin{itemize}
+    \item \textbf{Keyword Matching:} The simplest approach is to keep a list of known skills and search for them in the text. This is fast but misses variations.
+    \item \textbf{Named Entity Recognition (NER):} Advanced models use NLP (like Spacy or custom BERT models) to identify skills contextually. 
+\end{itemize}
+For our project, we decided to use a highly optimized dictionary-based Regex approach (Keyword Matching with aliases) because it is lightweight, fast, and doesn't require a GPU to run on a college server.
+
+\section{Traditional Curriculum Updates}
+Traditionally, a university forms a committee every 3 to 4 years to update the syllabus. They might invite a few industry experts for a meeting. This process is manual, biased by the opinions of a few people, and extremely slow. By the time a new syllabus is approved, the technology might already be obsolete. 
+
+\section{Machine Learning in Education}
+Machine learning is being increasingly used in EdTech for personalized learning. Systems can recommend courses based on a student's past performance. In our system, we use a recommendation engine to suggest specific courses (e.g., from Coursera or NPTEL) to bridge the exact skills a student is missing based on the job they want.
+
+\section{Research Gap Identified}
+Based on the literature survey, the main gaps are:
+\begin{itemize}
+    \item Most NLP models for skill extraction are too heavy to deploy on cheap college servers.
+    \item Existing LMI tools don't directly compare job skills against a college syllabus PDF.
+    \item There is no unified platform where students, colleges, and companies can interact directly regarding skill demands.
+\end{itemize}
+This project aims to fill this gap by providing a lightweight, full-stack solution.
+
+% --- CHAPTER 3: REQUIREMENT SPECIFICATION & METHODOLOGY ---
+\chapter{Requirement Specification \& Methodology}
+
+\section{Software Development Life Cycle (SDLC) Model}
+We chose the Agile methodology for this project. Since we had to build a complex 3-tier architecture (React, Node, Python) in a short time for the hackathon, Agile allowed us to develop features in sprints. We started with the basic login and database, then moved to the Python ML engine, and finally built the React dashboards.
+
+\section{Use Case Diagrams}
+The system has four main actors: Admin, Student, College, and Company.
+\begin{itemize}
+    \item \textbf{Student:} Can view market trends, do personal skill assessments, and check career pathways.
+    \item \textbf{College:} Can upload syllabus, view gap reports, generate training plans, and submit placement data.
+    \item \textbf{Company:} Can post jobs, submit industry consultations, and validate reports.
+    \item \textbf{Admin:} Views overall statistics and manages demo data seeding.
+\end{itemize}
+
+\section{Interfaces}
+\subsection{Software Interfaces}
+\begin{itemize}
+    \item \textbf{Frontend:} React.js, Vite, Axios, React Router.
+    \item \textbf{Backend:} Node.js, Express.js, Prisma ORM.
+    \item \textbf{ML Engine:} Python, Flask, Regular Expressions (re module).
+    \item \textbf{Database:} SQLite (for local development and easy setup).
+\end{itemize}
+
+\subsection{Hardware Interfaces}
+The project does not require specific hardware sensors. It runs on any standard computer.
+\begin{itemize}
+    \item Minimum 4GB RAM, Core i3 processor.
+    \item Internet connection for fetching course recommendations.
+\end{itemize}
+
+\subsection{Communication Interfaces}
+The frontend communicates with the Node.js backend via HTTP REST APIs (port 5000). The Node.js backend communicates with the Python ML Engine via HTTP POST/GET requests (port 5001). Data is exchanged in JSON format.
+
+\section{Methodology Used}
+\begin{enumerate}
+    \item \textbf{Data Collection:} We created a taxonomy of 200+ IT skills categorized into Web Dev, AI/ML, Cloud, etc.
+    \item \textbf{Preprocessing:} User inputs (syllabus text or job text) are converted to lowercase and cleaned of special characters. We apply an alias map (e.g., replacing 'mysql' with 'sql') to standardize terms.
+    \item \textbf{Feature Extraction:} The Python script uses word boundary regex (\verb|\b|) to match taxonomy skills inside the text.
+    \item \textbf{Analysis:} The extracted syllabus skills are mathematically subtracted from the extracted job skills to find the missing gaps.
+\end{enumerate}
+
+% --- CHAPTER 4: WORK DISTRIBUTION ---
+\chapter{Work Distribution}
+
+\section{Task Allocation}
+The work was divided to ensure parallel development of the frontend and backend.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Module} & \textbf{Description} & \textbf{Status} \\
+\hline
+Database Design & Creating Prisma schema models & Completed \\
+\hline
+Node Backend & User auth, job posting routes, analytics & Completed \\
+\hline
+Python ML Engine & Skill extraction, alias matching, gap logic & Completed \\
+\hline
+React Frontend & Dashboards for all 4 user roles & Completed \\
+\hline
+UI/UX Design & CSS styling, AI-themed neon aesthetic & Completed \\
+\hline
+Integration & Connecting React to Node and Node to Python & Completed \\
+\hline
+\end{tabular}
+\caption{Task Allocation}
+\end{table}
+
+\section{Module Details}
+\begin{itemize}
+    \item \textbf{Auth Module:} Handles JWT-based login and registration.
+    \item \textbf{Dashboard Module:} Renders different UI components based on the user's role.
+    \item \textbf{Analysis Module (Python):} Contains the \verb|SKILL_TAXONOMY|, alias mapping, and obsolete skill detection.
+\end{itemize}
+
+% --- CHAPTER 5: DESIGN DOCUMENT ---
+\chapter{Design Document}
+
+\section{Functional Description}
+The system follows a microservice-like architecture. The React app is the client. The Node.js server acts as the main API gateway and handles database operations. For heavy text analysis, Node.js forwards the text to the Python Flask server, which returns the extracted JSON data back to Node.js.
+
+\section{Data Description}
+We used Prisma ORM with SQLite. The main tables are:
+\begin{itemize}
+    \item \textbf{User:} Stores email, hashed password, role, and location.
+    \item \textbf{JobPosting:} Stores job title, description, sector, and salary.
+    \item \textbf{GapReport:} Stores the analysis results (missing skills, alignment score).
+    \item \textbf{TrainingPlan:} Stores generated training plans for districts.
+\end{itemize}
+
+\section{User Interface Design}
+The user interface is designed with a modern, dark-mode, AI-centric aesthetic. It uses neon cyan and purple highlights, glassmorphism panels, and AI-themed icons (like neural networks and data matrices) to look futuristic.
+
+% --- CHAPTER 6: EXPERIMENTAL SETUP ---
+\chapter{Experimental Setup}
+
+\section{Development Environment}
+\begin{itemize}
+    \item \textbf{OS:} Windows 11
+    \item \textbf{Node version:} v18+
+    \item \textbf{Python version:} 3.10+
+    \item \textbf{IDE:} Visual Studio Code
+\end{itemize}
+
+\section{Execution Process}
+To run the system locally, three terminal windows are required:
+\begin{enumerate}
+    \item \textbf{Frontend:} \verb|cd frontend| $\rightarrow$ \verb|npm run dev| (runs on port 5173)
+    \item \textbf{Backend:} \verb|cd backend| $\rightarrow$ \verb|npx tsx src/index.ts| (runs on port 5000)
+    \item \textbf{ML Engine:} \verb|cd ml-engine| $\rightarrow$ \verb|python app.py| (runs on port 5001)
+\end{enumerate}
+
+% --- CHAPTER 7: TEST PLAN DOCUMENT ---
+\chapter{Test Plan Document}
+
+\section{Test Strategy}
+We performed manual unit testing on the API endpoints using tools like Postman, and end-to-end UI testing through the browser.
+
+\section{Test Cases and Status Report}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{S.No.} & \textbf{Module} & \textbf{Status} & \textbf{Remarks} \\
+\hline
+1 & User Login \& Auth & Pass & JWT tokens working correctly. \\
+\hline
+2 & Job Posting Creation & Pass & Data saves to SQLite successfully. \\
+\hline
+3 & NLP Skill Extraction & Pass & Aliases (e.g. mysql $\rightarrow$ sql) matched correctly. \\
+\hline
+4 & Personal Assessment & Pass & Calculates correct alignment score. \\
+\hline
+5 & AI UI Theme applied & Pass & Neon colors and icons display correctly. \\
+\hline
+\end{tabular}
+\caption{Test Case Status Report}
+\end{table}
+
+% --- CHAPTER 8: RESULTS ---
+\chapter{Results}
+
+\section{Outputs and Observations}
+The system successfully identifies missing skills. For example, when a job description required "MySQL, Python, Power BI" and the syllabus only contained "Python", the system correctly flagged MySQL (normalized as SQL) and Power BI as missing skills. It also successfully generated a Training Plan suggesting that the college needs to acquire "Data Science Trainers" and "Cloud Sandbox Accounts".
+
+\section{Performance Analysis}
+The regex-based skill extraction in Python takes less than 50 milliseconds per request, making it extremely fast and suitable for real-time gap analysis without the need for expensive GPU servers.
+
+% --- CHAPTER 9: CONCLUSION & FUTURE WORK ---
+\chapter{Conclusion \& Future Work}
+
+\section{Conclusion}
+This project successfully designed and implemented a Labour Market Intelligence platform. The objectives outlined in Chapter 1 were achieved. We proved that by using a well-structured skill taxonomy and alias mapping, we can accurately compare student knowledge against industry requirements and generate actionable gap reports.
+
+\section{Limitations}
+\begin{itemize}
+    \item The current taxonomy is hardcoded to ~200 IT skills.
+    \item It currently does not parse actual PDF files directly in the UI (users have to copy-paste syllabus text).
+\end{itemize}
+
+\section{Future Work}
+\begin{itemize}
+    \item Implementing PDF and OCR parsing so colleges can directly upload their syllabus documents.
+    \item Moving the skill taxonomy to a dynamic cloud database so it can be updated by admins without changing code.
+    \item Integrating a real LLM (like Gemini or OpenAI) to handle complex, unstructured job descriptions instead of relying solely on regex.
+\end{itemize}
+
+% --- CHAPTER 10: GLOSSARY ---
+\chapter{Glossary}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{3cm}|p{4cm}|p{7cm}|}
+\hline
+\textbf{Term} & \textbf{Full Form} & \textbf{Description} \\
+\hline
+AI & Artificial Intelligence & Logic that simulates human decision making. \\
+\hline
+NLP & Natural Language Processing & Analyzing text data to extract meaning. \\
+\hline
+LMI & Labour Market Intelligence & Data regarding job market demand. \\
+\hline
+UI & User Interface & The visual layout of the application. \\
+\hline
+\end{tabular}
+\caption{Glossary of Terms}
+\end{table}
+
+% --- CHAPTER 11: REFERENCES ---
+\chapter{References}
+\begin{enumerate}
+    \item React Documentation, [Online]. Available: \url{https://react.dev/}
+    \item Flask Documentation, [Online]. Available: \url{https://flask.palletsprojects.com/}
+    \item Prisma ORM, "Next-generation Node.js and TypeScript ORM", [Online]. Available: \url{https://www.prisma.io/}
+    \item Previous Year SIH Problem Statements regarding Skill Gap Analysis.
+\end{enumerate}
+
+\end{document}
