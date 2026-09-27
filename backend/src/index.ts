@@ -1371,9 +1371,11 @@ const frontendDist = possibleDistPaths.find(p => fs.existsSync(p));
 if (frontendDist) {
   console.log(`Serving static frontend build from ${frontendDist}`);
   app.use(express.static(frontendDist));
-  app.get('*', (req: any, res: any, next: any) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(frontendDist, 'index.html'));
+  app.use((req: any, res: any, next: any) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(frontendDist, 'index.html'));
+    }
+    next();
   });
 }
 
