@@ -13,7 +13,8 @@ export default function StudentDashboard() {
 
     // Personal assessment
     const [mySkills, setMySkills] = useState('');
-    const [targetRole, setTargetRole] = useState('All');
+    const [targetRole, setTargetRole] = useState('Data Analyst');
+    const [selectedDistrict, setSelectedDistrict] = useState('Jaipur');
     const [personalResult, setPersonalResult] = useState(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [pathways, setPathways] = useState([]);
@@ -51,25 +52,25 @@ export default function StudentDashboard() {
         return Object.entries(freq).sort(([, a], [, b]) => b - a).slice(0, 15);
     };
 
-    // Personal skill assessment
+    const loadJaipurStudentDemo = () => {
+        setMySkills('Excel, Basic SQL');
+        setTargetRole('Data Analyst');
+        setSelectedDistrict('Jaipur');
+    };
+
+    // Personal skill assessment using backend closed-loop evaluation
     const handlePersonalAssessment = async (e) => {
         e.preventDefault();
         setAnalyzing(true);
         try {
-            const filteredJobs = targetRole === 'All' ? jobs : jobs.filter(j => j.title === targetRole);
-            if (filteredJobs.length === 0) {
-                alert('No active jobs found for this role.');
-                setAnalyzing(false);
-                return;
-            }
-            const allJobReqs = filteredJobs.map(j => `${j.title}: ${j.requirements}`).join('. ');
-            const res = await axios.post(`http://localhost:5001/analyze`, {
-                syllabusText: mySkills,
-                jobText: allJobReqs
+            const res = await axios.post(`${API}/api/student/evaluate`, {
+                skills: mySkills,
+                targetRole: targetRole !== 'All' ? targetRole : null,
+                district: selectedDistrict || 'Jaipur'
             });
             setPersonalResult(res.data);
         } catch (err) {
-            alert('ML engine not available');
+            alert(err.response?.data?.message || 'Assessment service unavailable');
         } finally {
             setAnalyzing(false);
         }
@@ -157,94 +158,178 @@ export default function StudentDashboard() {
             {activeTab === 'assess' && (
                 <div className="dashboard-grid grid-2">
                     <div className="glass-panel">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                            <Sparkles size={18} color="var(--primary)" />
-                            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Personal Skill Assessment</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Sparkles size={18} color="var(--primary)" />
+                                <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Personal Skill Assessment</h2>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn-sm btn-secondary"
+                                onClick={loadJaipurStudentDemo}
+                                style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                            >
+                                ⚡ Fill Jaipur Student Demo
+                            </button>
                         </div>
                         <p style={{ color: 'var(--muted-foreground)', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
-                            Benchmark your current skillset against active regional job vacancies to reveal precise gaps.
+                            Benchmark your competencies against active regional job vacancies to reveal suitable roles, missing skills, career milestones, and local demand.
                         </p>
                         <form onSubmit={handlePersonalAssessment}>
-                            <select
-                                value={targetRole}
-                                onChange={e => setTargetRole(e.target.value)}
-                            >
-                                <option value="All">All Roles (Compare against entire market)</option>
-                                {[...new Set(jobs.map(j => j.title))].map(role => (
-                                    <option key={role} value={role}>{role}</option>
-                                ))}
-                            </select>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--muted-foreground)', display: 'block', marginBottom: '0.2rem' }}>Target Role</label>
+                                    <select
+                                        value={targetRole}
+                                        onChange={e => setTargetRole(e.target.value)}
+                                    >
+                                        <option value="All">All Roles</option>
+                                        {[...new Set(jobs.map(j => j.title))].map(role => (
+                                            <option key={role} value={role}>{role}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--muted-foreground)', display: 'block', marginBottom: '0.2rem' }}>District</label>
+                                    <input
+                                        placeholder="District (e.g. Jaipur)"
+                                        value={selectedDistrict}
+                                        onChange={e => setSelectedDistrict(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--muted-foreground)', display: 'block', marginBottom: '0.2rem' }}>Your Acquired Skills</label>
                             <textarea
-                                placeholder="Enter skills you have (e.g. Python, Java, SQL, HTML, CSS, React, Machine Learning, Data Structures...)"
-                                rows="6"
+                                placeholder="Enter skills you have (e.g. Excel, SQL, Python, Power BI, Statistics...)"
+                                rows="5"
                                 value={mySkills}
                                 onChange={e => setMySkills(e.target.value)}
                                 required
                             />
-                            <button type="submit" style={{ width: '100%', marginTop: '0.25rem' }} disabled={analyzing}>
-                                {analyzing ? 'Analyzing against job requisitions...' : 'Run Skill Assessment'}
+                            <button type="submit" style={{ width: '100%', marginTop: '0.5rem' }} disabled={analyzing}>
+                                {analyzing ? 'Evaluating skills across job taxonomy...' : 'Run Comprehensive Evaluation'}
                             </button>
                         </form>
                     </div>
 
-                    <div className="glass-panel">
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--foreground)' }}>Assessment Findings</h2>
+                    <div className="glass-panel" style={{ maxHeight: '720px', overflowY: 'auto' }}>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--foreground)' }}>Evaluation Findings</h2>
                         {!personalResult ? (
-                            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem' }}>Enter your competencies and submit the assessment to calculate your market readiness.</p>
+                            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.85rem' }}>Click "Fill Jaipur Student Demo" or enter your skills to evaluate market readiness.</p>
                         ) : (
                             <>
-                                <div className="stat-card" style={{ marginBottom: '1.25rem', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.25rem' }}>
+                                {/* 1. Overall Alignment Score */}
+                                <div className="stat-card" style={{ marginBottom: '1rem', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.15rem' }}>
                                     <div>
-                                        <div className="stat-label">Market Alignment Index</div>
-                                        <div className="stat-value" style={{ fontSize: '1.75rem', marginTop: '0.2rem', color: personalResult.alignment_score >= 60 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
-                                            {personalResult.alignment_score}%
+                                        <div className="stat-label">Target Role Alignment ({personalResult.primaryTarget?.role || targetRole})</div>
+                                        <div className="stat-value" style={{ fontSize: '1.6rem', marginTop: '0.2rem', color: (personalResult.alignmentScore || 0) >= 60 ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
+                                            {personalResult.alignmentScore || 0}%
                                         </div>
                                     </div>
-                                    <div style={{ width: '140px' }}>
+                                    <div style={{ width: '130px' }}>
                                         <div className="score-bar-bg">
                                             <div className="score-bar-fill" style={{
-                                                width: `${personalResult.alignment_score}%`,
-                                                background: personalResult.alignment_score >= 60 ? 'var(--accent-success)' : 'var(--accent-danger)'
+                                                width: `${personalResult.alignmentScore || 0}%`,
+                                                background: (personalResult.alignmentScore || 0) >= 60 ? 'var(--accent-success)' : 'var(--accent-danger)'
                                             }}></div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.4rem' }}>
+                                {/* 2. Missing Skills */}
+                                <div style={{ marginBottom: '0.85rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                                         <XCircle size={14} color="var(--accent-danger)" />
                                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-danger)' }}>
-                                            Skills to Acquire ({personalResult.missing_skills?.length || 0})
+                                            Missing Industry Skills ({(personalResult.missingSkills || []).length})
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                                        {(personalResult.missing_skills || []).map(s => <span key={s} className="skill-tag missing">{s}</span>)}
+                                        {(personalResult.missingSkills || []).map(s => <span key={s} className="skill-tag missing">{s}</span>)}
                                     </div>
                                 </div>
 
-                                <div style={{ marginBottom: '1.25rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.4rem' }}>
+                                {/* 3. Matched Competencies */}
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                                         <CheckCircle2 size={14} color="var(--accent-success)" />
                                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-success)' }}>
-                                            Matched Competencies ({personalResult.matched_skills?.length || 0})
+                                            Matched Competencies ({(personalResult.matchedSkills || []).length})
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                                        {(personalResult.matched_skills || []).map(s => <span key={s} className="skill-tag matched">{s}</span>)}
+                                        {(personalResult.matchedSkills || []).map(s => <span key={s} className="skill-tag matched">{s}</span>)}
                                     </div>
                                 </div>
 
-                                {personalResult.recommendations && personalResult.recommendations.length > 0 && (
-                                    <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-                                        <h3 style={{ marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--foreground)' }}>
-                                            Tailored Learning Recommendations
+                                {/* 4. Suitable Job Roles */}
+                                {personalResult.suitableRoles?.length > 0 && (
+                                    <div style={{ marginBottom: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem' }}>
+                                        <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>
+                                            Suitable Job Roles in Regional Market
                                         </h3>
-                                        {personalResult.recommendations.slice(0, 5).map((rec, i) => (
-                                            <div key={i} className="card-item" style={{ padding: '0.65rem 0.85rem', marginBottom: '0.4rem' }}>
-                                                <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--foreground)' }}>{rec.course}</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>{rec.provider} · {rec.duration}</div>
+                                        {personalResult.suitableRoles.slice(0, 4).map((r, idx) => (
+                                            <div key={idx} className="card-item" style={{ padding: '0.65rem', marginBottom: '0.4rem', borderLeft: `3px solid ${r.matchPercentage >= 50 ? 'var(--accent-success)' : 'var(--accent-warning)'}` }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--foreground)' }}>{r.role}</span>
+                                                    <span className="badge badge-success">{r.matchPercentage}% Match</span>
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '0.85rem', fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.25rem' }}>
+                                                    <span>Salary: {r.avgSalary}</span>
+                                                    <span>Location: {r.location}</span>
+                                                    {r.companies?.length > 0 && <span>Hiring: {r.companies.join(', ')}</span>}
+                                                </div>
                                             </div>
                                         ))}
+                                    </div>
+                                )}
+
+                                {/* 5. Recommended Courses */}
+                                {personalResult.recommendations?.length > 0 && (
+                                    <div style={{ marginBottom: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem' }}>
+                                        <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>
+                                            Targeted Course Recommendations
+                                        </h3>
+                                        {personalResult.recommendations.map((rec, i) => (
+                                            <div key={i} className="card-item" style={{ padding: '0.55rem 0.75rem', marginBottom: '0.35rem' }}>
+                                                <div style={{ fontWeight: 600, fontSize: '0.825rem', color: 'var(--foreground)' }}>{rec.course}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>{rec.provider} · {rec.duration} · Focus: {rec.skill}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* 6. Career Pathway */}
+                                {personalResult.careerPathway?.milestones && (
+                                    <div style={{ marginBottom: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.85rem' }}>
+                                        <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>
+                                            Career Progression Pathway ({personalResult.careerPathway.role})
+                                        </h3>
+                                        {personalResult.careerPathway.milestones.map((m, i) => (
+                                            <div key={i} style={{ display: 'flex', gap: '0.65rem', marginBottom: '0.5rem', alignItems: 'start' }}>
+                                                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
+                                                    {i + 1}
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--foreground)' }}>{m.level}: {m.title} ({m.salary})</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Key Focus: {m.focus}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* 7. Local District Demand */}
+                                {personalResult.localDemand && (
+                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.85rem' }}>
+                                        <h3 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>
+                                            Local Hiring Demand in {personalResult.localDemand.district}
+                                        </h3>
+                                        <div style={{ background: 'var(--muted)', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius)', fontSize: '0.775rem' }}>
+                                            <div><strong>Active Postings:</strong> {personalResult.localDemand.activeRequisitions} openings</div>
+                                            <div><strong>Hiring Employers:</strong> {personalResult.localDemand.companiesHiring?.join(', ') || 'Regional Industry Partners'}</div>
+                                            <div><strong>Typical Package Range:</strong> {personalResult.localDemand.salaryRange || '4-8 LPA'}</div>
+                                        </div>
                                     </div>
                                 )}
                             </>

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: skillbridge-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true

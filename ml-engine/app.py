@@ -96,6 +96,7 @@ SKILL_TAXONOMY = {
     "hadoop": {"category": "Data Science", "sector": "IT", "demand": "Medium", "trend": "Declining"},
     "spark": {"category": "Data Science", "sector": "IT", "demand": "High", "trend": "Rising"},
     "power bi": {"category": "Data Science", "sector": "IT", "demand": "High", "trend": "Rising"},
+    "statistics": {"category": "Data Science", "sector": "IT", "demand": "High", "trend": "Rising"},
     "tableau": {"category": "Data Science", "sector": "IT", "demand": "Medium", "trend": "Stable"},
     "generative ai": {"category": "AI/ML", "sector": "IT", "demand": "High", "trend": "Rising"},
     "llm": {"category": "AI/ML", "sector": "IT", "demand": "High", "trend": "Rising"},
@@ -237,6 +238,8 @@ COURSE_RECOMMENDATIONS = {
     "flutter": {"course": "Flutter & Dart Complete Guide", "provider": "Udemy / Google", "duration": "10 weeks", "level": "Intermediate"},
     "digital marketing": {"course": "Google Digital Marketing", "provider": "Google / NPTEL", "duration": "8 weeks", "level": "Beginner"},
     "power bi": {"course": "Power BI Data Analyst", "provider": "Microsoft Learn", "duration": "8 weeks", "level": "Intermediate"},
+    "statistics": {"course": "Statistics for Data Science & Business Analytics", "provider": "NPTEL / Coursera", "duration": "8 weeks", "level": "Beginner"},
+    "excel": {"course": "Excel Skills for Business & Analytics", "provider": "Coursera / Macquarie", "duration": "6 weeks", "level": "Beginner"},
     "devops": {"course": "DevOps Engineering Course", "provider": "NPTEL / Udemy", "duration": "12 weeks", "level": "Intermediate"},
     "terraform": {"course": "Terraform Associate Certification", "provider": "HashiCorp / Udemy", "duration": "6 weeks", "level": "Intermediate"},
     "system design": {"course": "System Design for Interviews", "provider": "Educative / NPTEL", "duration": "8 weeks", "level": "Advanced"},
@@ -244,6 +247,21 @@ COURSE_RECOMMENDATIONS = {
     "autocad": {"course": "AutoCAD Essentials Training", "provider": "Autodesk / NPTEL", "duration": "6 weeks", "level": "Beginner"},
     "embedded systems": {"course": "Embedded Systems Design", "provider": "NPTEL / Coursera", "duration": "12 weeks", "level": "Intermediate"},
     "blockchain": {"course": "Blockchain Basics", "provider": "Coursera / NPTEL", "duration": "8 weeks", "level": "Intermediate"},
+    "html": {"course": "Responsive Web Design & HTML5", "provider": "freeCodeCamp / W3C", "duration": "4 weeks", "level": "Beginner"},
+    "css": {"course": "Modern CSS & Responsive Design", "provider": "Udemy / MDN", "duration": "5 weeks", "level": "Beginner"},
+    "typescript": {"course": "Understanding TypeScript", "provider": "Udemy / Microsoft", "duration": "6 weeks", "level": "Intermediate"},
+    "tailwind css": {"course": "Tailwind CSS From Scratch", "provider": "Udemy / Traversy", "duration": "4 weeks", "level": "Beginner"},
+    "express": {"course": "Node.js & Express - Backend Development", "provider": "Coursera / freeCodeCamp", "duration": "6 weeks", "level": "Intermediate"},
+    "rest api": {"course": "RESTful API Design & Architecture", "provider": "Udemy / NPTEL", "duration": "4 weeks", "level": "Intermediate"},
+    "linux": {"course": "Linux Fundamentals & Shell Scripting", "provider": "Linux Foundation / edX", "duration": "6 weeks", "level": "Beginner"},
+    "ci/cd": {"course": "Continuous Integration & Delivery (CI/CD)", "provider": "GitLab / Coursera", "duration": "6 weeks", "level": "Intermediate"},
+    "ethical hacking": {"course": "Practical Ethical Hacking & Pentesting", "provider": "TCM Security / Udemy", "duration": "10 weeks", "level": "Intermediate"},
+    "network security": {"course": "Network Security & Cryptography", "provider": "Cisco Networking Academy / NPTEL", "duration": "8 weeks", "level": "Intermediate"},
+    "react native": {"course": "React Native - Practical Mobile Apps", "provider": "Udemy / Meta", "duration": "8 weeks", "level": "Intermediate"},
+    "android": {"course": "Android App Development with Kotlin", "provider": "Google Developers / Coursera", "duration": "10 weeks", "level": "Beginner"},
+    "c++": {"course": "Mastering C++ & Modern STL", "provider": "NPTEL / Udemy", "duration": "8 weeks", "level": "Beginner"},
+    "pandas": {"course": "Data Analysis with Python & Pandas", "provider": "DataCamp / Coursera", "duration": "5 weeks", "level": "Beginner"},
+    "numpy": {"course": "Scientific Computing with NumPy", "provider": "Coursera / DeepLearning.AI", "duration": "4 weeks", "level": "Beginner"},
 }
 
 
@@ -254,18 +272,33 @@ def extract_skills(text):
     """
     text_lower = text.lower()
     
-    # Handle common aliases to make matching more robust (as requested)
+    # Handle common aliases using word boundary substitution
     aliases = {
-        "powerbi": "power bi",
-        "power-bi": "power bi",
-        "mysql": "sql",
-        "postgresql": "sql",
-        "reactjs": "react",
-        "nodejs": "node.js"
+        r'\bpowerbi\b': "power bi",
+        r'\bpower-bi\b': "power bi",
+        r'\bmysql\b': "sql",
+        r'\bpostgresql\b': "sql",
+        r'\bbasic sql\b': "sql",
+        r'\badvanced sql\b': "sql",
+        r'\breactjs\b': "react",
+        r'\bnodejs\b': "node.js",
+        r'\bstatistics and probability\b': "statistics",
+        r'\bbusiness statistics\b': "statistics",
+        r'\bapplied statistics\b': "statistics",
+        r'\bbasic statistics\b': "statistics",
+        r'\bms excel\b': "excel",
+        r'\bmicrosoft excel\b': "excel",
+        r'\badvanced excel\b': "excel",
+        r'\bpython3\b': "python",
+        r'\bpy\b': "python",
+        r'\bhtml5\b': "html",
+        r'\bcss3\b': "css",
+        r'\bexpressjs\b': "express",
+        r'\bgithub\b': "git",
+        r'\bk8s\b': "kubernetes",
     }
-    for alias, canonical in aliases.items():
-        # Replace occurrences as a quick normalization
-        text_lower = text_lower.replace(alias, canonical)
+    for alias_pattern, canonical in aliases.items():
+        text_lower = re.sub(alias_pattern, canonical, text_lower)
 
     found = {}
 
@@ -500,33 +533,44 @@ def generate_training_plan():
     courses = []
     trainers_needed = set()
     equipment = set()
+    equipment_gaps = []
 
     for skill in target_skills:
-        if skill in COURSE_RECOMMENDATIONS:
-            rec = COURSE_RECOMMENDATIONS[skill].copy()
+        s_lower = skill.lower().strip()
+        if s_lower in COURSE_RECOMMENDATIONS:
+            rec = COURSE_RECOMMENDATIONS[s_lower].copy()
             rec["skill"] = skill
             courses.append(rec)
 
-        info = SKILL_TAXONOMY.get(skill, {})
+        info = SKILL_TAXONOMY.get(s_lower, {})
         cat = info.get("category", "General")
-        trainers_needed.add(f"{cat} domain expert")
 
-        if cat in ["Programming", "Web Development", "AI/ML", "Data Science"]:
-            equipment.add("Computer Lab with Internet")
-        elif cat in ["CAD", "Simulation"]:
-            equipment.add(f"Workstations with {skill.title()} software licenses")
-        elif cat in ["Embedded", "Hardware"]:
-            equipment.add("Electronics Lab with microcontrollers")
+        if s_lower in ["power bi", "tableau"]:
+            trainers_needed.add("Business Intelligence & Visualization Specialist")
+            equipment.add("High-RAM Workstations with Power BI Desktop")
+            equipment_gaps.append(f"Infrastructure Gap: Dedicated BI Workstations with multi-display capability")
+        elif s_lower in ["statistics", "machine learning", "deep learning", "nlp", "ai"]:
+            trainers_needed.add(f"{s_lower.title()} & Data Science Mentor")
+            equipment.add("JupyterLab Compute Server with GPU Acceleration")
+            equipment_gaps.append(f"Infrastructure Gap: Missing GPU/Jupyter compute environment for {s_lower.title()}")
         elif cat in ["Cloud", "DevOps"]:
-            equipment.add("Cloud sandbox accounts (AWS/Azure)")
-            
-    # Oversupply simulation logic: For a real region, this would query
-    # the number of grads vs job postings. For now we detect common legacy skills.
+            trainers_needed.add(f"{s_lower.title()} Certified Cloud Architect")
+            equipment.add("Cloud Sandbox Accounts (AWS/Azure Educational Credits)")
+            equipment_gaps.append(f"Infrastructure Gap: Educational cloud sandbox subscriptions")
+        elif cat in ["CAD", "Simulation"]:
+            trainers_needed.add(f"{s_lower.title()} CAD Simulation Engineer")
+            equipment.add(f"Workstations with {s_lower.title()} software licenses")
+            equipment_gaps.append(f"Infrastructure Gap: High-spec engineering workstations with {s_lower.title()} licenses")
+        else:
+            trainers_needed.add(f"{cat} Domain Specialist ({s_lower.title()})")
+            equipment.add("Modern Computer Lab with High-Speed Internet")
+
+    # Regional oversupply simulation logic
     oversupplied = []
     legacy = ["c programming", "php", "tally", "manual testing"]
     for leg in legacy:
-        if leg not in target_skills:
-            oversupplied.append(leg.title())
+        if leg not in [s.lower().strip() for s in target_skills]:
+            oversupplied.append(f"{leg.title()} (Regional Saturation)")
 
     return jsonify({
         'district': district,
@@ -534,7 +578,8 @@ def generate_training_plan():
         'recommended_courses': courses,
         'trainer_requirements': list(trainers_needed),
         'equipment_needed': list(equipment),
-        'oversupplied_skills': oversupplied[:2], # Flag top 2 oversupplied
+        'equipment_gaps': equipment_gaps,
+        'oversupplied_skills': oversupplied[:2],
         'estimated_timeline': f"{max(3, len(target_skills) * 2)} months",
         'estimated_batch_size': 30
     })

@@ -13,7 +13,7 @@ export default function CollegeDashboard() {
     const token = localStorage.getItem('token');
 
     // Syllabus form
-    const [form, setForm] = useState({ branch: '', semester: '', subjects: '', content: '', university: '', lastUpdated: '2024' });
+    const [form, setForm] = useState({ branch: '', semester: '', subjects: '', content: '', university: '', lastUpdated: '2024', targetRole: 'Data Analyst', district: 'Jaipur' });
 
     // Training plan form
     const [tpForm, setTpForm] = useState({ district: '', targetSkills: '' });
@@ -35,12 +35,51 @@ export default function CollegeDashboard() {
         try { const r = await axios.get(`${API}/api/training-plans`); setTrainingPlans(r.data); } catch (e) { }
     };
 
+    const loadDataAnalystDemo = () => {
+        setForm({
+            branch: 'B.Tech Computer Science (Data Analytics)',
+            semester: 'Semester 5',
+            university: 'Rajasthan Technical University (RTU)',
+            lastUpdated: '2022',
+            subjects: 'Database Management Systems, Business Spreadsheets',
+            content: 'Spreadsheet Analysis with Advanced Excel, Formulas, Pivot Tables, Relational Database Management Systems, Basic SQL Queries, ER Diagrams, Relational Normalization.',
+            targetRole: 'Data Analyst',
+            district: 'Jaipur'
+        });
+    };
+
+    const loadWebDeveloperDemo = () => {
+        setForm({
+            branch: 'B.Tech Computer Science & Engineering (Web Tech)',
+            semester: 'Semester 5',
+            university: 'Rajasthan Technical University (RTU)',
+            lastUpdated: '2022',
+            subjects: 'Web Technologies & Internet Programming',
+            content: 'Hypertext Markup Language (HTML5), Cascading Style Sheets (CSS3), JavaScript Fundamentals, DOM Manipulation, Event Listeners, Responsive Web Layouts, Flexbox, CSS Grid.',
+            targetRole: 'Web Developer',
+            district: 'Jaipur'
+        });
+    };
+
+    const loadCloudDevOpsDemo = () => {
+        setForm({
+            branch: 'B.Tech Information Technology (Cloud Infrastructure)',
+            semester: 'Semester 6',
+            university: 'Rajasthan Technical University (RTU)',
+            lastUpdated: '2022',
+            subjects: 'Operating Systems & Network Administration',
+            content: 'Linux Operating System Architecture, Shell Scripting, File Permissions, TCP/IP Networking, DNS, Routing, Server Virtualization.',
+            targetRole: 'Cloud & DevOps Engineer',
+            district: 'Jaipur'
+        });
+    };
+
     const handleUpload = async (e) => {
         e.preventDefault();
         setIsAnalyzing(true);
         try {
             await axios.post(`${API}/api/syllabus`, form, { headers: { Authorization: `Bearer ${token}` } });
-            setForm({ branch: '', semester: '', subjects: '', content: '', university: '', lastUpdated: '2024' });
+            setForm({ branch: '', semester: '', subjects: '', content: '', university: '', lastUpdated: '2024', targetRole: 'Data Analyst', district: 'Jaipur' });
             fetchReports();
             setActiveTab('reports');
         } catch (err) {
@@ -72,6 +111,11 @@ export default function CollegeDashboard() {
         } catch (err) {
             alert('Failed to submit placement data.');
         }
+    };
+
+    const handlePlanForReport = (district, missingSkills) => {
+        setTpForm({ district: district || 'Jaipur', targetSkills: missingSkills });
+        setActiveTab('plans');
     };
 
     return (
@@ -109,21 +153,92 @@ export default function CollegeDashboard() {
                             <UploadCloud size={18} color="var(--primary)" />
                             <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)' }}>Syllabus Ingestion & Analysis</h2>
                         </div>
-                        <p style={{ color: 'var(--muted-foreground)', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
-                            Submit department syllabi for automated evaluation against 200+ industry competencies and regional hiring requirements.
+                        <p style={{ color: 'var(--muted-foreground)', marginBottom: '0.75rem', fontSize: '0.85rem' }}>
+                            Submit department syllabi for automated evaluation against industry competencies and regional hiring requirements.
                         </p>
+
+                        {/* Interactive Role Presets */}
+                        <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1rem', background: 'var(--secondary)', padding: '0.5rem 0.65rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--foreground)', marginRight: '0.2rem' }}>⚡ Load Sample Preset:</span>
+                            <button
+                                type="button"
+                                className="btn-sm btn-secondary"
+                                onClick={loadDataAnalystDemo}
+                                style={{ fontSize: '0.72rem', padding: '0.2rem 0.45rem' }}
+                            >
+                                📊 Data Analyst (Jaipur)
+                            </button>
+                            <button
+                                type="button"
+                                className="btn-sm btn-secondary"
+                                onClick={loadWebDeveloperDemo}
+                                style={{ fontSize: '0.72rem', padding: '0.2rem 0.45rem' }}
+                            >
+                                🌐 Web Developer (Jaipur)
+                            </button>
+                            <button
+                                type="button"
+                                className="btn-sm btn-secondary"
+                                onClick={loadCloudDevOpsDemo}
+                                style={{ fontSize: '0.72rem', padding: '0.2rem 0.45rem' }}
+                            >
+                                ☁️ Cloud & DevOps (Jaipur)
+                            </button>
+                        </div>
+
                         <form onSubmit={handleUpload}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                                <input placeholder="Branch (e.g. Computer Science)" value={form.branch} onChange={e => setForm({ ...form, branch: e.target.value })} required />
-                                <input placeholder="Semester (e.g. 5)" value={form.semester} onChange={e => setForm({ ...form, semester: e.target.value })} required />
+                                <input placeholder="Program / Course (e.g. B.Tech CSE or Data Analytics Course)" value={form.branch} onChange={e => setForm({ ...form, branch: e.target.value })} required />
+                                <input placeholder="Semester / Term (e.g. Sem 5 or Module 1)" value={form.semester} onChange={e => setForm({ ...form, semester: e.target.value })} required />
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                                <input placeholder="University / Institute" value={form.university} onChange={e => setForm({ ...form, university: e.target.value })} />
-                                <input placeholder="Last Updated Year" value={form.lastUpdated} onChange={e => setForm({ ...form, lastUpdated: e.target.value })} />
+                                <input placeholder="University / Institute (e.g. RTU)" value={form.university} onChange={e => setForm({ ...form, university: e.target.value })} />
+                                <input placeholder="Curriculum Year (e.g. 2022)" value={form.lastUpdated} onChange={e => setForm({ ...form, lastUpdated: e.target.value })} />
                             </div>
-                            <input placeholder="Subjects (comma-separated, e.g. Data Structures, DBMS, OS)" value={form.subjects} onChange={e => setForm({ ...form, subjects: e.target.value })} />
-                            <textarea placeholder="Paste syllabus text here... (Topics, units, technologies taught)" rows="8" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} required />
-                            <button type="submit" style={{ width: '100%' }} disabled={isAnalyzing}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                <div>
+                                    <input
+                                        list="target-roles-list"
+                                        placeholder="Target Career Role (e.g. Web Developer)"
+                                        value={form.targetRole}
+                                        onChange={e => setForm({ ...form, targetRole: e.target.value })}
+                                        required
+                                    />
+                                    <datalist id="target-roles-list">
+                                        <option value="Data Analyst" />
+                                        <option value="Web Developer" />
+                                        <option value="Frontend Developer" />
+                                        <option value="Full Stack Developer" />
+                                        <option value="Cloud & DevOps Engineer" />
+                                        <option value="Data Scientist" />
+                                        <option value="Cybersecurity Analyst" />
+                                        <option value="Mobile Application Developer" />
+                                    </datalist>
+                                </div>
+                                <div>
+                                    <input
+                                        list="target-districts-list"
+                                        placeholder="Hiring District (e.g. Jaipur)"
+                                        value={form.district}
+                                        onChange={e => setForm({ ...form, district: e.target.value })}
+                                    />
+                                    <datalist id="target-districts-list">
+                                        <option value="Jaipur" />
+                                        <option value="Jodhpur" />
+                                        <option value="Udaipur" />
+                                        <option value="Kota" />
+                                        <option value="Bangalore" />
+                                        <option value="Mumbai" />
+                                        <option value="Hyderabad" />
+                                        <option value="Pune" />
+                                        <option value="Delhi NCR" />
+                                        <option value="All" />
+                                    </datalist>
+                                </div>
+                            </div>
+                            <input placeholder="Subjects / Course Modules (e.g. DBMS & SQL, Business Spreadsheets, or Module 1 to 4)" value={form.subjects} onChange={e => setForm({ ...form, subjects: e.target.value })} />
+                            <textarea placeholder="Paste syllabus content here... (Units, topics, technologies taught, e.g. Excel, Basic SQL queries...)" rows="6" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} required />
+                            <button type="submit" style={{ width: '100%', marginTop: '0.5rem' }} disabled={isAnalyzing}>
                                 {isAnalyzing ? 'Analyzing curriculum against job taxonomy...' : 'Execute Gap Analysis'}
                             </button>
                         </form>
@@ -144,7 +259,7 @@ export default function CollegeDashboard() {
                         {reports.length > 0 && (
                             <div>
                                 <h3 style={{ marginBottom: '0.75rem', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)' }}>Latest Curriculum Audit</h3>
-                                <ReportCard report={reports[0]} compact />
+                                <ReportCard report={reports[0]} compact onPlanNeeded={handlePlanForReport} onReportUpdated={fetchReports} />
                             </div>
                         )}
                     </div>
@@ -159,7 +274,7 @@ export default function CollegeDashboard() {
                             <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>No reports generated yet. Upload a syllabus on the Upload tab.</p>
                         </div>
                     ) : (
-                        reports.map(r => <ReportCard key={r.id} report={r} />)
+                        reports.map(r => <ReportCard key={r.id} report={r} onPlanNeeded={handlePlanForReport} onReportUpdated={fetchReports} />)
                     )}
                 </div>
             )}
@@ -284,32 +399,65 @@ export default function CollegeDashboard() {
     );
 }
 
-function ReportCard({ report, compact, onRevised }) {
+function ReportCard({ report, compact, onPlanNeeded, onReportUpdated }) {
     const r = report;
     const token = localStorage.getItem('token');
-    let recommendations = [];
-    try { recommendations = JSON.parse(r.recommendations || '[]'); } catch (e) { }
+    let initialRecs = [];
+    try { initialRecs = JSON.parse(r.recommendations || '[]'); } catch (e) { }
     let demandAnalysis = {};
     try { demandAnalysis = JSON.parse(r.demandAnalysis || '{}'); } catch (e) { }
 
     const [revisionStatus, setRevisionStatus] = React.useState(demandAnalysis.revisionStatus || null);
-    const [marking, setMarking] = React.useState(false);
-    const validationStatus = demandAnalysis.validationStatus || null;
-    const scoreColor = r.overallScore >= 70 ? 'var(--accent-success)' : r.overallScore >= 40 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+    const [score, setScore] = React.useState(r.overallScore);
+    const [missingSkills, setMissingSkills] = React.useState(r.missingSkills);
+    const [matchedSkills, setMatchedSkills] = React.useState(r.matchedSkills);
+    const [recs, setRecs] = React.useState(initialRecs);
+    const [showReviseBox, setShowReviseBox] = React.useState(false);
+    const [topicsToAppend, setTopicsToAppend] = React.useState(r.missingSkills || '');
+    const [reanalyzing, setReanalyzing] = React.useState(false);
+    const [reanalyzeMsg, setReanalyzeMsg] = React.useState(null);
 
-    const handleMarkRevised = async () => {
-        setMarking(true);
+    React.useEffect(() => {
+        setScore(report.overallScore);
+        setMissingSkills(report.missingSkills);
+        setMatchedSkills(report.matchedSkills);
+        try { setRecs(JSON.parse(report.recommendations || '[]')); } catch (e) { }
+        setTopicsToAppend(report.missingSkills || '');
+        let d = {};
+        try { d = JSON.parse(report.demandAnalysis || '{}'); } catch (e) { }
+        setRevisionStatus(d.revisionStatus || null);
+    }, [report]);
+
+    const validationStatus = demandAnalysis.validationStatus || null;
+    const scoreColor = score >= 70 ? 'var(--accent-success)' : score >= 40 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+
+    const handleExecuteReanalysis = async () => {
+        setReanalyzing(true);
+        setReanalyzeMsg(null);
         try {
-            await axios.patch(`${API}/api/reports/${r.id}/status`,
-                { status: 'Revised' },
+            const res = await axios.post(`${API}/api/reports/${r.id}/reanalyze`,
+                { newTopics: topicsToAppend },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+            setScore(res.data.newScore);
             setRevisionStatus('Revised');
-            alert('Curriculum marked as updated.');
-            if (onRevised) onRevised(r.id);
+            setMissingSkills(res.data.report?.missingSkills || '');
+            setMatchedSkills(res.data.report?.matchedSkills || '');
+            if (res.data.report?.recommendations) {
+                try { setRecs(JSON.parse(res.data.report.recommendations)); } catch (e) { }
+            }
+            setReanalyzeMsg({
+                previous: res.data.previousScore,
+                current: res.data.newScore,
+                gain: res.data.improvement,
+                text: res.data.message
+            });
+            if (onReportUpdated) onReportUpdated();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to update status');
-        } finally { setMarking(false); }
+            alert(err.response?.data?.message || 'Failed to re-analyze curriculum');
+        } finally {
+            setReanalyzing(false);
+        }
     };
 
     return (
@@ -317,12 +465,14 @@ function ReportCard({ report, compact, onRevised }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
                 <div>
                     <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.2rem' }}>
-                        {r.college?.name || 'Institution'} — {r.syllabus?.branch} (Sem {r.syllabus?.semester})
+                        {r.college?.name || 'Institution'} — {r.syllabus?.branch} ({r.syllabus?.semester})
                     </h3>
-                    {r.syllabus?.university && <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>{r.syllabus.university}</span>}
+                    <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                        {r.syllabus?.university || 'State Technical University'} {r.syllabus?.subjects ? `· Modules: ${r.syllabus.subjects}` : ''} {demandAnalysis.district ? `· Location: ${demandAnalysis.district}` : ''} {demandAnalysis.targetRole ? `· Target Role: ${demandAnalysis.targetRole}` : ''}
+                    </div>
                     <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
                         {revisionStatus === 'Revised' && (
-                            <span className="badge badge-success">✓ Curriculum Revised</span>
+                            <span className="badge badge-success">✓ Curriculum Revised (Score: {score}%)</span>
                         )}
                         {validationStatus === 'Employer Validated' && (
                             <span className="badge badge-success">✓ Employer Validated</span>
@@ -333,26 +483,59 @@ function ReportCard({ report, compact, onRevised }) {
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 700, color: scoreColor }}>{r.overallScore}%</div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 700, color: scoreColor }}>{score}%</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', fontWeight: 500, textTransform: 'uppercase' }}>Alignment Index</div>
                 </div>
             </div>
 
             {/* Score Bar */}
             <div className="score-bar-bg" style={{ marginBottom: '1.25rem' }}>
-                <div className="score-bar-fill" style={{ width: `${r.overallScore}%`, background: scoreColor }}></div>
+                <div className="score-bar-fill" style={{ width: `${score}%`, background: scoreColor }}></div>
             </div>
+
+            {/* Employer Validation Audit Evidence Callout */}
+            {validationStatus === 'Employer Validated' && (
+                <div style={{ background: 'oklch(0.97 0.02 145)', border: '1px solid oklch(0.90 0.05 145)', borderRadius: 'var(--radius)', padding: '0.65rem 0.85rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: 'oklch(0.35 0.12 145)', fontSize: '0.8rem' }}>
+                        <CheckCircle size={14} /> Employer Validation Evidence Stored
+                    </div>
+                    <div style={{ fontSize: '0.775rem', color: 'var(--foreground)', marginTop: '0.2rem' }}>
+                        <strong>Validated by:</strong> {demandAnalysis.validatedBy || 'Industry Hiring Committee'}
+                    </div>
+                    {demandAnalysis.validationComment && (
+                        <div style={{ fontSize: '0.775rem', color: 'var(--muted-foreground)', marginTop: '0.15rem', fontStyle: 'italic' }}>
+                            "{demandAnalysis.validationComment}"
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Closed-Loop Score Jump Notification */}
+            {reanalyzeMsg && (
+                <div style={{ background: 'oklch(0.96 0.03 145)', border: '1px solid oklch(0.88 0.08 145)', padding: '0.75rem 0.9rem', borderRadius: 'var(--radius)', marginBottom: '1rem' }}>
+                    <div style={{ fontWeight: 700, color: 'oklch(0.35 0.14 145)', fontSize: '0.875rem' }}>
+                        🎉 Closed-Loop Verification: Curriculum Alignment jumped from {reanalyzeMsg.previous}% → {reanalyzeMsg.current}% (+{reanalyzeMsg.gain}% Gain)!
+                    </div>
+                    <div style={{ fontSize: '0.775rem', color: 'var(--foreground)', marginTop: '0.25rem' }}>
+                        The curriculum update successfully satisfied all demanded industry skills.
+                    </div>
+                </div>
+            )}
 
             {/* Missing Skills */}
             <div style={{ marginBottom: '0.85rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                     <XCircle size={14} color="var(--accent-danger)" />
                     <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-danger)' }}>
-                        Missing Industry Skills ({r.missingSkills.split(',').filter(s => s.trim()).length})
+                        Missing Industry Skills ({missingSkills.split(',').filter(s => s.trim()).length})
                     </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
-                    {r.missingSkills.split(',').filter(s => s.trim()).map(s => <span key={s} className="skill-tag missing">{s.trim()}</span>)}
+                    {missingSkills.split(',').filter(s => s.trim()).length > 0 ? (
+                        missingSkills.split(',').filter(s => s.trim()).map(s => <span key={s} className="skill-tag missing">{s.trim()}</span>)
+                    ) : (
+                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-success)', fontStyle: 'italic' }}>None! All demanded skills covered.</span>
+                    )}
                 </div>
             </div>
 
@@ -361,11 +544,11 @@ function ReportCard({ report, compact, onRevised }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
                     <CheckCircle size={14} color="var(--accent-success)" />
                     <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-success)' }}>
-                        Covered Skills ({r.matchedSkills.split(',').filter(s => s.trim()).length})
+                        Covered Competencies ({matchedSkills.split(',').filter(s => s.trim()).length})
                     </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
-                    {r.matchedSkills.split(',').filter(s => s.trim()).map(s => <span key={s} className="skill-tag matched">{s.trim()}</span>)}
+                    {matchedSkills.split(',').filter(s => s.trim()).map(s => <span key={s} className="skill-tag matched">{s.trim()}</span>)}
                 </div>
             </div>
 
@@ -385,7 +568,7 @@ function ReportCard({ report, compact, onRevised }) {
             )}
 
             {/* Recommendations */}
-            {!compact && recommendations.length > 0 && (
+            {!compact && recs.length > 0 && (
                 <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
                     <h4 style={{ marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--foreground)' }}>
                         Recommended Curriculum Modernizations
@@ -401,7 +584,7 @@ function ReportCard({ report, compact, onRevised }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {recommendations.map((rec, i) => (
+                            {recs.map((rec, i) => (
                                 <tr key={i}>
                                     <td style={{ fontWeight: 600 }}>{rec.skill}</td>
                                     <td>{rec.course}</td>
@@ -415,23 +598,64 @@ function ReportCard({ report, compact, onRevised }) {
                 </div>
             )}
 
-            {/* Mark as Revised Action */}
+            {/* Closed-Loop Curriculum Revision Panel */}
             {!compact && (
-                <div style={{ marginTop: '1.25rem', paddingTop: '0.85rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
-                        {revisionStatus === 'Revised'
-                            ? 'Curriculum updates logged.'
-                            : 'Click to record that the syllabus has been revised with these competencies.'}
-                    </span>
-                    {revisionStatus !== 'Revised' && (
-                        <button
-                            className="btn-sm btn-secondary"
-                            onClick={handleMarkRevised}
-                            disabled={marking}
-                            style={{ whiteSpace: 'nowrap', marginLeft: '1rem' }}
-                        >
-                            {marking ? 'Updating...' : 'Mark Syllabus as Revised'}
-                        </button>
+                <div style={{ marginTop: '1.25rem', paddingTop: '0.85rem', borderTop: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)' }}>
+                                Closed-Loop Curriculum Revision Workflow
+                            </span>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.1rem' }}>
+                                Add validated missing competencies into the syllabus, then re-analyze to measure alignment score improvement.
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            {onPlanNeeded && missingSkills && (
+                                <button
+                                    type="button"
+                                    className="btn-sm btn-outline"
+                                    onClick={() => onPlanNeeded(demandAnalysis.district || 'Jaipur', missingSkills)}
+                                >
+                                    <MapPin size={13} /> Create District Training Plan
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                className="btn-sm btn-secondary"
+                                onClick={() => setShowReviseBox(!showReviseBox)}
+                            >
+                                {showReviseBox ? 'Close Revision Box' : 'Revise Curriculum & Re-Analyze'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {showReviseBox && (
+                        <div style={{ background: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '0.85rem', marginTop: '0.85rem' }}>
+                            <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
+                                Competencies to Append into Syllabus (Auto-populated with missing skills):
+                            </label>
+                            <input
+                                value={topicsToAppend}
+                                onChange={e => setTopicsToAppend(e.target.value)}
+                                placeholder="e.g. Power BI, Python, Statistics"
+                                style={{ marginBottom: '0.5rem', fontSize: '0.85rem' }}
+                            />
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <button
+                                    type="button"
+                                    className="btn-sm"
+                                    onClick={handleExecuteReanalysis}
+                                    disabled={reanalyzing}
+                                    style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+                                >
+                                    {reanalyzing ? 'Re-analyzing with ML Engine...' : '🚀 Apply Revisions & Re-Calculate Alignment'}
+                                </button>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>
+                                    Will append topics to syllabus content and invoke ML alignment engine.
+                                </span>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}
