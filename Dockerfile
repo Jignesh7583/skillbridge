@@ -30,14 +30,10 @@ RUN cd backend && npm install
 COPY backend/ backend/
 RUN cd backend && npx prisma generate
 
-# 4. Setup Startup Script
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
 # Environment settings
 EXPOSE 5000
 ENV PORT=5000
 ENV NODE_ENV=production
 ENV PATH="/app/ml-engine/venv/bin:$PATH"
 
-CMD ["/app/start.sh"]
+CMD ["sh", "-c", "python3 ml-engine/app.py & cd /app/backend && npx prisma db push --accept-data-loss && exec npx tsx src/index.ts"]
